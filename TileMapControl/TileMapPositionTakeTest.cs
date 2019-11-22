@@ -9,6 +9,7 @@ using System.Diagnostics;
 
 public class TileMapPositionTakeTest : MonoBehaviour
 {
+    private PathRequestManager requestManager;
     [SerializeField] private Grid grid;
     private Tilemap tilemap;
     public List<Tilemap> obstacleLayers; // all layers that contain objects
@@ -51,8 +52,10 @@ public class TileMapPositionTakeTest : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
+        requestManager = GetComponent<PathRequestManager>();
+
         tilemap = GetComponent<Tilemap>();
         pathGrid = GetComponent<PathGrid>();
         tilemap.CompressBounds();
@@ -93,7 +96,7 @@ public class TileMapPositionTakeTest : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.P))
             {
-                FindPath(PathFinder.position, Target.position);
+                // FindPath(PathFinder.position, Target.position);
             }
 
         }
@@ -112,7 +115,7 @@ public class TileMapPositionTakeTest : MonoBehaviour
 
     public void StartFindPath(Vector3 startPos, Vector3 targetPos)
     {
-        //
+        StartCoroutine(FindPath(startPos, targetPos));
     }
     private void GrabNodes()
     {
@@ -255,12 +258,22 @@ public class TileMapPositionTakeTest : MonoBehaviour
         return floorCells[x, y];
     }
 
-    private void FindPath(Vector3 startPos, Vector3 targetPos)
+    private IEnumerator FindPath(Vector3 startPos, Vector3 targetPos)
     {
         Stopwatch sw = new Stopwatch();
         sw.Start();
+
+        Vector3[] waypoints = new Vector3[0];
+        bool pathSuccess = false;
+
         PathNode startNode = pathGrid.NodeFromWorldPoint(startPos);
         PathNode targetNode = pathGrid.NodeFromWorldPoint(targetPos);
+
+        if (startNode.Walkable && targetNode.Walkable)
+        {
+
+        }
+
         //Instantiate(placeholderPrefab, startNode.WorldPosition, Quaternion.identity);
         //Instantiate(placeholderPrefab, targetNode.WorldPosition, Quaternion.identity);
 
@@ -297,8 +310,11 @@ public class TileMapPositionTakeTest : MonoBehaviour
                 sw.Stop();
                 print("Path found: " + sw.ElapsedMilliseconds + " ms");
 
-                RetracePath(startNode, targetNode);
-                return;
+                pathSuccess = true;
+
+                //RetracePath(startNode, targetNode);
+                //return;
+                break;
             }
 
             foreach (PathNode neighbour in pathGrid.GetNeighbour(currentNode))
@@ -327,9 +343,18 @@ public class TileMapPositionTakeTest : MonoBehaviour
         }
         // List<PathNode> tempList = openSet;
         // HashSet<PathNode> tempList2 = closedSet;
+        
+        yield return null;
+        if (pathSuccess)
+        {
+            waypoints = RetracePath(startNode, targetNode);
+        }
+        requestManager.FinishProcessingPath(waypoints, pathSuccess);
+
+
     }
 
-    private void RetracePath(PathNode startNode, PathNode endNode)
+    private Vector3[] RetracePath(PathNode startNode, PathNode endNode)
     {
         List<PathNode> path = new List<PathNode>();
         PathNode currentNode = endNode;
@@ -339,8 +364,38 @@ public class TileMapPositionTakeTest : MonoBehaviour
             path.Add(currentNode);
             currentNode = currentNode.Parent;
         }
+        
+        Vector3[] waypoints = SimplifyPath(path);
         path.Reverse();
         pathGrid.Path = path;
+
+
+        Array.Reverse(waypoints);
+        return waypoints;
+    }
+
+    Vector3[] SimplifyPath(List<PathNode> path)
+    {
+        List<Vector3> waypoints = new List<Vector3>();
+
+        // TODO: Debug that it's working properly. highly doubted vector2.zero or 
+        // x(i-1) - x(i), y(i-1) - y(i) will work on my isometric cells.
+        
+        // 0,0 1,1 (same direction, on straight line) 
+        // 0,0 0,1 (or 1,0) (same direciotn, on diagonal line)
+
+        Vector2 directionOld = Vector2.zero;
+        for (int i = 1; i<path.Count;++i)
+        {
+            Vector2 directionNew = new Vector2(path[i-1].GridX - path[i].GridX , path[i - 1].GridY - path[i].GridY);
+            if (directionNew != directionOld)
+            {
+                waypoints.Add(path[i].WorldPosition);
+            }
+            directionOld = directionNew;
+        }
+
+        return waypoints.ToArray();
 
     }
 
@@ -358,7 +413,6 @@ public class TileMapPositionTakeTest : MonoBehaviour
 
         // cell 4,4(adjacent of start), cell 3,2(target)
         // X is 1, Y is 2
-
 
         int straightCost = 10; // 1.
         int diagonalCost = 6; // approximately 0.559....:x...
