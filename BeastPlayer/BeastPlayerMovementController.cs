@@ -42,8 +42,11 @@ public class BeastPlayerMovementController : MonoBehaviour
     private void Awake()
     {
         // rb = GetComponentInChildren<Rigidbody>();
+        
         rb = GetComponent<Rigidbody>();
         animator = GetComponentInChildren<Animator>();
+
+        Debug.Log(gameObject.name);
     }
     // Start is called before the first frame update
     void Start()

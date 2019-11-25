@@ -37,7 +37,8 @@ public class PathGrid : MonoBehaviour
         tilemap.CompressBounds();
         GrabWorldLocationToList();
         CreateGrid();
-        NodeFromWorldPoint(placeholderTransform.position);
+        // NodeFromWorldPoint(placeholderTransform.position);
+        GetName();
         
     }
     public int MaxSize
@@ -197,5 +198,17 @@ public class PathGrid : MonoBehaviour
 
         Debug.Log("start or last is null....");
         return null;
+    }
+
+    public void GetName()
+    {
+        var pos = tileWorldLocations.First();
+        pos.y -= 0.25f;
+        var newPos = tilemap.WorldToCell(pos);
+        Vector3Int localPlace = new Vector3Int(newPos.x, newPos.y, newPos.z);
+
+        Vector3 place = tilemap.CellToWorld(localPlace);
+        TileBase tilebase = tilemap.GetTile(newPos);
+        Debug.Log(tilebase.name);
     }
 }

@@ -271,79 +271,63 @@ public class TileMapPositionTakeTest : MonoBehaviour
 
         if (startNode.Walkable && targetNode.Walkable)
         {
+            PathHeap<PathNode> openSet = new PathHeap<PathNode>(pathGrid.MaxSize);
+            HashSet<PathNode> closedSet = new HashSet<PathNode>();
 
-        }
+            openSet.Add(startNode);
 
-        //Instantiate(placeholderPrefab, startNode.WorldPosition, Quaternion.identity);
-        //Instantiate(placeholderPrefab, targetNode.WorldPosition, Quaternion.identity);
-
-        // Debug.Log(startNode.WorldPosition + " " + targetNode.WorldPosition);
-
-        // List<PathNode> openSet = new List<PathNode>();
-        PathHeap<PathNode> openSet = new PathHeap<PathNode>(pathGrid.MaxSize);
-        HashSet<PathNode> closedSet = new HashSet<PathNode>();
-
-        openSet.Add(startNode);
-
-        while (openSet.Count > 0)
-        {
-            // PathNode currentNode = openSet[0];
-            PathNode currentNode = openSet.RemoveFirstItem();
-            //for (int i = 1; i < openSet.Count; ++i)
-            //{
-            //    // it's not optimized. do not use it as raw.
-            //    if (openSet[i].FCost < currentNode.FCost || openSet[i].FCost == currentNode.FCost)
-            //    {
-            //        if (openSet[i].HCost < currentNode.HCost)
-            //        {
-            //            currentNode = openSet[i];
-            //        }
-            //    }
-            //}
-            //// now check open and closed set...
-
-            //openSet.Remove(currentNode);
-            closedSet.Add(currentNode);
-
-            if (currentNode == targetNode)
+            while (openSet.Count > 0)
             {
-                sw.Stop();
-                print("Path found: " + sw.ElapsedMilliseconds + " ms");
 
-                pathSuccess = true;
+                PathNode currentNode = openSet.RemoveFirstItem();
+                closedSet.Add(currentNode);
 
-                //RetracePath(startNode, targetNode);
-                //return;
-                break;
-            }
-
-            foreach (PathNode neighbour in pathGrid.GetNeighbour(currentNode))
-            {
-                if (neighbour == null)
+                if (currentNode == targetNode)
                 {
-                    continue;
+                    sw.Stop();
+                    print("Path found: " + sw.ElapsedMilliseconds + " ms");
+
+                    pathSuccess = true;
+
+                    //RetracePath(startNode, targetNode);
+                    //return;
+                    break;
                 }
-                if (!neighbour.Walkable || closedSet.Contains(neighbour))
-                {
-                    continue;
-                }
-                int newMovementCostToNeighbour = currentNode.GCost + GetDistance(currentNode, neighbour);
-                if (newMovementCostToNeighbour < neighbour.GCost || openSet.Contains(neighbour) == false)
-                {
-                    neighbour.GCost = newMovementCostToNeighbour;
-                    neighbour.HCost = GetDistance(neighbour, targetNode);
-                    neighbour.Parent = currentNode;
 
-                    if (openSet.Contains(neighbour) == false)
+                foreach (PathNode neighbour in pathGrid.GetNeighbour(currentNode))
+                {
+                    if (neighbour == null)
                     {
-                        openSet.Add(neighbour);
+                        continue;
+                    }
+                    if (!neighbour.Walkable || closedSet.Contains(neighbour))
+                    {
+                        continue;
+                    }
+                    int newMovementCostToNeighbour = currentNode.GCost + GetDistance(currentNode, neighbour);
+                    if (newMovementCostToNeighbour < neighbour.GCost || openSet.Contains(neighbour) == false)
+                    {
+                        neighbour.GCost = newMovementCostToNeighbour;
+                        neighbour.HCost = GetDistance(neighbour, targetNode);
+                        neighbour.Parent = currentNode;
+
+                        if (openSet.Contains(neighbour) == false)
+                        {
+                            openSet.Add(neighbour);
+                        }
+                        else
+                        {
+                            openSet.UpdateItem(neighbour);
+                        }
                     }
                 }
             }
+            // List<PathNode> tempList = openSet;
+            // HashSet<PathNode> tempList2 = closedSet;
+
         }
-        // List<PathNode> tempList = openSet;
-        // HashSet<PathNode> tempList2 = closedSet;
-        
+
+
         yield return null;
         if (pathSuccess)
         {
@@ -551,7 +535,7 @@ public class TileMapPositionTakeTest : MonoBehaviour
 
     #endregion
 
-    // Update is called once per frame
+    
     
     private void cellWalkableCheck()
     {
@@ -602,9 +586,19 @@ public class TileMapPositionTakeTest : MonoBehaviour
     }
 
 
+    // 1125
+    // check tiles can have information.
+    private void TestMethod()
+    {
+        tileBase = tilemap.GetTile(Vector3Int.zero);
+        // tileBase.
+        // tileBase.GetTileData()
+    }
+    
+
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireCube(transform.position, new Vector3(floorSize.x, floorSize.y, 0));
+        // Gizmos.DrawWireCube(transform.position, new Vector3(floorSize.x, floorSize.y, 0));
         // Gizmos.DrawCube
         //if(grid != null)
         //{
