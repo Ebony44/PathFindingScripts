@@ -6,16 +6,39 @@ using UnityEngine;
 public class PathUnit : MonoBehaviour
 {
 
-    public Transform target;
+    
+    
+
+    public Transform TargetTransform;
     [SerializeField] private float speed = 1f;
     private Vector3[] path;
     private int targetIndex;
 
 
-    // Start is called before the first frame update
     void Start()
     {
-        PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
+        // TargetTransform.Find("Cube (6)");
+        // TEST PURPOSE delete this find() after test.
+        // TargetTransform = GameObject.Find("Cube (6)").transform;
+        // TransformChanged += RequestForChangedTransform;
+        PathRequestManager.RequestPath(transform.position, TargetTransform.position, OnPathFound);
+        // if position is changed after success... -> reuqestpath again.
+    }
+    public void RequestForChangedTransform()
+    {
+        
+    }
+    private void OnDisable()
+    {
+        
+        
+        //????
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
     }
 
     private void OnPathFound(Vector3[] newPath, bool pathSuccessful)
@@ -73,9 +96,4 @@ public class PathUnit : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

@@ -40,11 +40,11 @@ public class TileMapPositionTakeTest : MonoBehaviour
 
     // public Action<>
 
-    private PathNode[,] floorCells;
+    
     private PathGrid pathGrid;
 
-    public Transform PathFinder;
-    public Transform Target;
+    // public Transform PathFinder;
+    // public Transform Target;
 
     private enum eCellSetting
     {
@@ -92,23 +92,7 @@ public class TileMapPositionTakeTest : MonoBehaviour
     void Update()
     {
         ChangeColorOnClick();
-        if (PathFinder != null && Target != null)
-        {
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                // FindPath(PathFinder.position, Target.position);
-            }
 
-        }
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            //Debug.DrawLine(pathGrid.Path.First().WorldPosition, pathGrid.Path.Last().WorldPosition);
-            foreach (PathNode node in pathGrid.Path)
-            {
-                Instantiate(placeholderPrefab, node.WorldPosition, Quaternion.identity);
-            }
-            //Instantiate(placeholderPrefab, startNode.WorldPosition, Quaternion.identity);
-        }
 
 
     }
@@ -250,13 +234,6 @@ public class TileMapPositionTakeTest : MonoBehaviour
         */
     }
 
-    public PathNode NodeFromWorldPoint(Vector3 worldPos)
-    {
-        int x = tilemap.WorldToCell(worldPos).x;
-        int y = tilemap.WorldToCell(worldPos).y;
-
-        return floorCells[x, y];
-    }
 
     private IEnumerator FindPath(Vector3 startPos, Vector3 targetPos)
     {
@@ -304,7 +281,7 @@ public class TileMapPositionTakeTest : MonoBehaviour
                     {
                         continue;
                     }
-                    int newMovementCostToNeighbour = currentNode.GCost + GetDistance(currentNode, neighbour);
+                    int newMovementCostToNeighbour = currentNode.GCost + GetDistance(currentNode, neighbour) + neighbour.Hindrance;
                     if (newMovementCostToNeighbour < neighbour.GCost || openSet.Contains(neighbour) == false)
                     {
                         neighbour.GCost = newMovementCostToNeighbour;
@@ -596,20 +573,5 @@ public class TileMapPositionTakeTest : MonoBehaviour
     }
     
 
-    private void OnDrawGizmos()
-    {
-        // Gizmos.DrawWireCube(transform.position, new Vector3(floorSize.x, floorSize.y, 0));
-        // Gizmos.DrawCube
-        //if(grid != null)
-        //{
-        //    foreach(Vector3Int unwalkableCell in unwalkableCells)
-        //    {
-        //        //Gizmos.color = unwalkableCell
-        //        Gizmos.color = Color.red;
-        //        Gizmos.DrawCube(unwalkableCell, grid.cellSize * 1.2f);
-        //    }
-        //}
-
-    }
 
 }

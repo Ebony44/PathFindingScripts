@@ -11,18 +11,22 @@ public class PathNode : IHeapItem<PathNode>
     public int GridX { get; set; }
     public int GridY { get; set; }
 
+    public int Hindrance { get; set; }
+
     public int GCost { get; set; }
     public int HCost { get; set; }
 
     public PathNode Parent { get; set; }
 
 
-    public PathNode (bool walkable, Vector3 worldPosition, int gridX, int gridY)
+    public PathNode (bool walkable, Vector3 worldPosition, int gridX, int gridY, int hindrance)
     {
         Walkable = walkable;
         WorldPosition = worldPosition;
         GridX = gridX;
         GridY = gridY;
+        Hindrance = hindrance;
+
     }
 
     public int FCost
