@@ -10,14 +10,14 @@ public class PathRequestManager : MonoBehaviour
     private PathRequest currentPathRequest;
 
     public static PathRequestManager Instance { get; set; }
-    TileMapPositionTakeTest pathFinding;
+    PathFindingSystem pathFinding;
 
     bool bProcessingPath;
 
     private void Awake()
     {
         Instance = this;
-        pathFinding = GetComponent<TileMapPositionTakeTest>();
+        pathFinding = GetComponent<PathFindingSystem>();
     }
 
     public static void RequestPath(Vector3 pathStart, Vector3 pathEnd, Action<Vector3[], bool> callback)

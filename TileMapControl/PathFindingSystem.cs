@@ -7,25 +7,13 @@ using System.Linq;
 
 using System.Diagnostics;
 
-public class TileMapPositionTakeTest : MonoBehaviour
+public class PathFindingSystem : MonoBehaviour
 {
     private PathRequestManager requestManager;
     [SerializeField] private Grid grid;
     private Tilemap tilemap;
-    public List<Tilemap> obstacleLayers; // all layers that contain objects
+    
 
-    [SerializeField] private Vector2 floorSize;
-
-    //public int scanStartX;
-    //public int scanStartY;
-    //public int scanFinishX;
-    //public int scanFinishY;
-
-    //public List<GameObject> UnsortedNodes = new List<GameObject>();
-    //public HashSet<GameObject> Sortednodes = new HashSet<GameObject>();
-    //public GameObject nodePrefab;
-
-    // private TileBase[] tileArray;
 
     [SerializeField] private TileBase tileBase;
 
@@ -93,147 +81,12 @@ public class TileMapPositionTakeTest : MonoBehaviour
     {
         ChangeColorOnClick();
 
-
-
     }
 
     public void StartFindPath(Vector3 startPos, Vector3 targetPos)
     {
         StartCoroutine(FindPath(startPos, targetPos));
     }
-    private void GrabNodes()
-    {
-        /*
-        // var tileWorldLocations = new List<Vector3>();
-        // TODO: Figure out how many cells will contain in 1 Scene. currently 8k.
-        // well, if it's lacking, it will AUTOMATICALLY resize..but it's not performance wise :x
-        
-        tileWorldLocations.Capacity = (int) eCellSetting.CELL_MAX_COUNT;
-        // Vector3Int floorHeight = tilemap.cellBounds.allPositionsWithin;
-        int floorMinX = tilemap.cellBounds.xMin;
-        int floorMaxX = tilemap.cellBounds.xMax;
-        int floorMinY = tilemap.cellBounds.yMin;
-        int floorMaxY = tilemap.cellBounds.yMax;
-        Debug.Log(tilemap.cellBounds.xMin + " and " + tilemap.cellBounds.xMax);
-        Debug.Log(tilemap.cellBounds.yMin + " and " + tilemap.cellBounds.yMax);
-        Debug.Log(tilemap.cellBounds.min + " and " + tilemap.cellBounds.max);
-        Debug.Log(tilemap.CellToWorld (tilemap.cellBounds.min) + " and " + tilemap.CellToWorld( tilemap.cellBounds.max));
-        foreach (var pos in tilemap.cellBounds.allPositionsWithin)
-        {
-            
-            Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
-            
-            Vector3 place = tilemap.CellToWorld(localPlace);
-            place.y += 0.25f;
-            if (tilemap.HasTile(localPlace))
-            {
-                tileWorldLocations.Add(place);
-
-            }
-            // if (tilemap.WorldToCell(localPlace) ==  )
-            // var floorMinX =
-        }
-
-        // this one for testing. i already checked it, so it's just ARCHIVE.
-        foreach (var location in tileWorldLocations)
-        {
-            
-            // Instantiate(placeholderPrefab, location, Quaternion.identity);
-        }
-
-        // tilemap.GetTile(grid.WorldToCell(Vector3.zero))
-
-        // for ()
-        
-        var minY = tileWorldLocations.Min(vector => vector.y);
-        var maxY = tileWorldLocations.Max(vector => vector.y);
-        var minX = tileWorldLocations.Min(vector => vector.x);
-        var maxX = tileWorldLocations.Max(vector => vector.x);
-        Debug.Log("minY is : " + minY + " and maxY is:  " + maxY + " also minmaxX is : " + minX + " " + maxX);
-
-        foreach(Vector3 vector in tileWorldLocations)
-        {
-            if (Physics.CheckSphere(vector, nodeRadius,unwalkableMask))
-            {
-                
-                // TODO: check it's walkable or not.
-
-                // Debug.Log("something is unwalkable!");
-                // var placeholder = Instantiate(placeholderPrefab, vector, Quaternion.identity);
-                // placeholder.GetComponent<MeshRenderer>().material.color = Color.red;
-            }
-            
-            // pathNodes[vector.x,vector.y] = new PathNode()
-        }
-
-        // X axis while
-        Vector3? xAxisVector = null;
-        xAxisVector = new Vector3(minX, minY, 0);
-        Vector3? yAxisVector = null;
-        yAxisVector = new Vector3(minX, minY, 0);
-        int xIndex = 0;
-        int yIndex = 0;
-        var worldFloorPoint = new Vector3(minX, minY, 0);
-        var listOfMinX = tileWorldLocations.FindAll(vector => vector.x == minX);
-        var leastY = listOfMinX.Min((vector => vector.y));
-        worldFloorPoint = new Vector3(minX, leastY, 0);
-        //
-
-        var floorSizeX = Mathf.Abs(floorMaxX) + Mathf.Abs(floorMinX);   //Mathf.Abs(Mathf.Max(minX, maxX) / Mathf.Min(minX, maxX));
-        var floorSizeY = Mathf.Abs(floorMaxY) + Mathf.Abs(floorMinY);   //Mathf.Abs(Mathf.Max(minY, maxY) / Mathf.Min(minY, maxY));
-        floorCells = new PathNode[floorSizeX, floorSizeY];
-        Vector3 worldPoint = worldFloorPoint;
-        for (int x = 0; x < floorSizeX; ++x)
-        {
-            for (int y = 0; y < floorSizeY; ++y)
-            {
-                // + (Vector3.right * (0.5f)) + (Vector3.up * (0.25f));
-                bool walkable = !Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask);
-                var testVariable = tilemap.WorldToCell(worldPoint - Vector3.up * 0.25f);
-                bool testBool = tilemap.HasTile(testVariable);
-                if (tilemap.HasTile(tilemap.WorldToCell(worldPoint - Vector3.up * 0.25f))) 
-                {
-                    floorCells[x, y] = new PathNode(walkable, worldPoint, x, y);
-                }
-                worldPoint += (Vector3.right * (0.5f)) + (Vector3.up * (0.25f));
-
-            }
-            worldPoint = worldFloorPoint + (Vector3.right * (x + 1) * (0.5f)) - (Vector3.up * (x + 1) * (0.25f));
-        }
-
-        // every segment, x: +0.5, y: +0.25
-        #region
-        //Vector3 worldPoint = worldFloorPoint;
-        //while (xAxisVector != null)
-        //{
-        //    // ++xIndex;
-        //    // Vector3 worldPoint = worldFloorPoint + Vector3.right * (0.5f) + Vector3.up * (0.25f);
-        //    // tilemap.HasTile(tilemap.WorldToCell(worldPoint)
-        //    // while (yAxisVector != null)
-
-        //    while (tilemap.HasTile(tilemap.WorldToCell(worldPoint)) == false)
-        //    {
-        //        worldPoint = worldFloorPoint + Vector3.right * (0.5f) + Vector3.up * (0.25f);
-        //        yAxisVector = worldPoint;
-        //        bool walkable = !Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask);
-        //        floorCells[xIndex, yIndex] = new PathNode(walkable, worldPoint, xIndex, yIndex);
-        //        ++yIndex;
-        //    }
-        //    // worldPoint = 
-        //}
-        #endregion
-        // for Testing 2
-        foreach(var node in floorCells)
-        {
-            if (node != null)
-            {
-                Instantiate(placeholderPrefab, node.WorldPosition, Quaternion.identity);
-            }
-            
-        }
-        */
-    }
-
 
     private IEnumerator FindPath(Vector3 startPos, Vector3 targetPos)
     {
@@ -563,14 +416,6 @@ public class TileMapPositionTakeTest : MonoBehaviour
     }
 
 
-    // 1125
-    // check tiles can have information.
-    private void TestMethod()
-    {
-        tileBase = tilemap.GetTile(Vector3Int.zero);
-        // tileBase.
-        // tileBase.GetTileData()
-    }
     
 
 
