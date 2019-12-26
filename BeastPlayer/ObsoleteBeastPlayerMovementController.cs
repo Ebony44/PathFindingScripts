@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BeastPlayerMovementController : MonoBehaviour
+public class ObsoleteBeastPlayerMovementController : MonoBehaviour
 {
     [SerializeField] private float movementSpeed = 1f;
     private Rigidbody rb;
     private Animator animator;
     //private Animation myAnimation;
     [Header("MoveVariables")]
-    private float horizon;
-    private float vertical;
+    
     [SerializeField] private float movementAngle1;
     [SerializeField] private float movementAngle2;
     [SerializeField] private float movementAngleRaw;
@@ -48,96 +47,18 @@ public class BeastPlayerMovementController : MonoBehaviour
 
         Debug.Log(gameObject.name);
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
     private void FixedUpdate()
     {
 
         Vector3 currentPos = rb.position;
-
-
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
         float horizontalInputRaw = Input.GetAxisRaw("Horizontal");
         float verticalInputRaw = Input.GetAxisRaw("Vertical");
 
-        // horizon = horizontalInput;
-        // vertical = verticalInput;
-        #region
-        /*
-        float signumHorizon = 0;
-        float signumVertical = 0;
-        float signumHorVert = 0;
-        float signumhorizonPower = 0;
-
-        
-        if (horizontalInput * horizontalInput == 0)
-        {
-            signumhorizonPower = 0;
-        }
-        else if (horizontalInput * horizontalInput < 0)
-        {
-            signumhorizonPower = -1;
-        }
-        else if (horizontalInput * horizontalInput > 0)
-        {
-            signumhorizonPower = 1;
-        }
-
-        if (horizontalInput == 0)
-        {
-            signumHorizon = 0;
-        }
-        else if(horizontalInput < 0)
-        {
-            signumHorizon = -1;
-        }
-        else if (horizontalInput > 0)
-        {
-            signumHorizon = 1;
-        }
-
-        if (verticalInput == 0)
-        {
-            signumVertical = 0;
-        }
-        else if (verticalInput < 0)
-        {
-            signumVertical = -1;
-        }
-        else if (verticalInput > 0)
-        {
-            signumVertical = 1;
-        }
-
-        if (verticalInput * horizontalInput == 0)
-        {
-            signumHorVert = 0;
-        }
-        else if (verticalInput * horizontalInput < 0)
-        {
-            signumHorVert = -1;
-        }
-        else if (verticalInput * horizontalInput > 0)
-        {
-            signumHorVert = 1;
-        }
-        
-        float absHor = Mathf.Abs(horizontalInput);
-        float absVer = Mathf.Abs(verticalInput);
-        */
-        #endregion
 
         movementAngle1 = Mathf.Atan2(horizontalInput, verticalInput);
-        //movementAngle2 = mathDefined.PI - (mathDefined.PI / 2 * (1 + signumVertical) * (1 - signumHorizon)) -
-        //    mathDefined.PI/4 * (2 + signumVertical) * signumHorizon -
-        //    (signumHorVert) * Mathf.Atan((absVer - absHor) / (absVer + absHor));
-
         movementAngleRaw = Mathf.Atan2(horizontalInputRaw, verticalInputRaw);
         Vector3 inputVector = new Vector3(horizontalInput, verticalInput, rb.position.z);
         inputVector = Vector2.ClampMagnitude(inputVector, 1);
@@ -162,19 +83,6 @@ public class BeastPlayerMovementController : MonoBehaviour
             // rb.MoveRotation(rotation);
             transform.localEulerAngles = rotation.eulerAngles;
 
-            /*
-            var forward = Camera.main.transform.forward;
-            forward.y = 0f;
-            forward = Vector3.Normalize(forward);
-            var right = Quaternion.Euler(new Vector3(0, 90, 0)) * forward;
-
-
-            var rightMovement = Vector3.right * horizontalInput;
-            var upMovement = Vector3.up * verticalInput;
-            Vector3 heading = Vector3.Normalize(rightMovement + upMovement);
-            transform.right = heading/ 2;
-            */
-            // transform.forward = Vector3.Normalize(rightMovement + upMovement) / 2;
         }
         else if (horizontalInputRaw == 0 || verticalInputRaw == 0)
         {
@@ -211,16 +119,19 @@ public class BeastPlayerMovementController : MonoBehaviour
         Backstep(mousePosAngle);
     }
 
+
+    private void HandleMovement()
+    {
+
+    }
+
     private void MovementAnimation(float horizontal, float vertical)
     {
 
         bool bIsMoving = horizontal != 0f || vertical != 0f;
         animator.SetBool("isMoving", bIsMoving);
     }
-    private void Idle()
-    {
 
-    }
     private void Attack(float mousePosAngle)
     {
         if (Input.GetButton("Fire1") && attackDelay >= maxAttackDelay)
@@ -382,9 +293,4 @@ public class BeastPlayerMovementController : MonoBehaviour
         // rb.rotation = Quaternion.Euler(newRotationX * Mathf.Rad2Deg, 90, 0);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }

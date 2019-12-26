@@ -26,7 +26,7 @@ public class DroneAttack : MonoBehaviour, IAttack
     {
         if (TargetTransform == null)
         {
-            TargetTransform = FindObjectOfType<BeastPlayerMovementController>().transform;
+            TargetTransform = FindObjectOfType<ObsoleteBeastPlayerMovementController>().transform;
             
         }
         attackDelay += Time.deltaTime;

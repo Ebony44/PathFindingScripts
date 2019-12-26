@@ -21,7 +21,7 @@ public class DroneStateController : MonoBehaviour
         // after implement Wander -> Chase
         if (Target == null)
         {
-            SetTarget(FindObjectOfType<BeastPlayerMovementController>().transform);
+            SetTarget(FindObjectOfType<ObsoleteBeastPlayerMovementController>().transform);
         }
         
         SetLineRenderer(GetComponent<LineRenderer>());
